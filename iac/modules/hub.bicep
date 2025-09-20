@@ -126,7 +126,10 @@ module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
     extensionCustomScriptConfig: {
       name: 'install-iperf3'
       settings: {
-        commandToExecute: 'apt-get update && apt-get install -y iperf3'
+        fileUris: [
+          'https://raw.githubusercontent.com/evgenyb/azfw-perf/refs/heads/main/iac/scripts/init.sh'
+        ]
+        commandToExecute: 'sh init.sh'
       }
     }
     osType: 'Linux'
