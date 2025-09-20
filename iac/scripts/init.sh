@@ -1,6 +1,6 @@
 #!/bin/sh
 
-apt-get update
+sudo apt-get update
 
 echo "Installing iperf3..." 
-apt-get install -y iperf3
+sudo apt-get install -y iperf3

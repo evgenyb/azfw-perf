@@ -40,38 +40,38 @@ module hub 'modules/hub.bicep' = {
   }
 }
 
-module servers 'modules/spoke.bicep' = [for i in range(1, 4): {
-  name: 'deploy-servers${i}-${resourcePrefix}'
-  scope: resourceGroup(resourceGroupName)
-  params: {
-    parIndex: i
-    parLocation: location
-    parAddressRange: '10.9.${i}.0/24'
-    parWorkspaceResourceId: workspace.outputs.resourceId    
-    adminUsername: adminUsername
-    adminPassword: adminPassword
-    hubVnetId: hub.outputs.hubVnetId
-    vmSize: 'Standard_D2ds_v6'
-    commandToExecute: 'apt-get update && apt-get install -y iperf3 && iperf3 -s'
-  }  
-}]
+// module servers 'modules/spoke.bicep' = [for i in range(1, 4): {
+//   name: 'deploy-servers${i}-${resourcePrefix}'
+//   scope: resourceGroup(resourceGroupName)
+//   params: {
+//     parIndex: i
+//     parLocation: location
+//     parAddressRange: '10.9.${i}.0/24'
+//     parWorkspaceResourceId: workspace.outputs.resourceId    
+//     adminUsername: adminUsername
+//     adminPassword: adminPassword
+//     hubVnetId: hub.outputs.hubVnetId
+//     vmSize: 'Standard_D2ds_v6'
+//     commandToExecute: 'apt-get update && apt-get install -y iperf3 && iperf3 -s'
+//   }  
+// }]
 
-module clients 'modules/spoke.bicep' = [for i in range(5, 8): {
-  name: 'deploy-clients${i}-${resourcePrefix}'
-  scope: resourceGroup(resourceGroupName)
-  dependsOn: [
-    servers
-  ]
-  params: {
-    parIndex: i
-    parLocation: location
-    parAddressRange: '10.9.${i}.0/24'
-    parWorkspaceResourceId: workspace.outputs.resourceId    
-    adminUsername: adminUsername
-    adminPassword: adminPassword
-    hubVnetId: hub.outputs.hubVnetId
-    vmSize: 'Standard_D2ds_v6'
-    commandToExecute: 'apt-get install -y iperf3'
-  }  
-}]
+// module clients 'modules/spoke.bicep' = [for i in range(5, 8): {
+//   name: 'deploy-clients${i}-${resourcePrefix}'
+//   scope: resourceGroup(resourceGroupName)
+//   dependsOn: [
+//     servers
+//   ]
+//   params: {
+//     parIndex: i
+//     parLocation: location
+//     parAddressRange: '10.9.${i}.0/24'
+//     parWorkspaceResourceId: workspace.outputs.resourceId    
+//     adminUsername: adminUsername
+//     adminPassword: adminPassword
+//     hubVnetId: hub.outputs.hubVnetId
+//     vmSize: 'Standard_D2ds_v6'
+//     commandToExecute: 'apt-get install -y iperf3'
+//   }  
+// }]
 
