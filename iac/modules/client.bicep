@@ -89,7 +89,7 @@ module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
       name: 'install-iperf3'
       settings: {
         fileUris: [
-          'https://raw.githubusercontent.com/evgenyb/azfw-perf/refs/heads/main/iac/scripts/init.sh'
+          'https://raw.githubusercontent.com/evgenyb/azfw-perf/refs/heads/main/iac/scripts/client.sh'
         ]
         commandToExecute: 'sh client.sh'
       }

@@ -46,7 +46,7 @@ module servers 'modules/server.bicep' = [for i in range(1, 4): {
   params: {
     parIndex: i
     parLocation: location
-    parAddressRange: '10.9.${i}.0/24'
+    parAddressRange: '10.9.1${i}.0/24'
     parWorkspaceResourceId: workspace.outputs.resourceId    
     adminUsername: adminUsername
     adminPassword: adminPassword
@@ -64,7 +64,7 @@ module clients 'modules/client.bicep' = [for i in range(1, 4): {
   params: {
     parIndex: i
     parLocation: location
-    parAddressRange: '10.9.${i}.0/24'
+    parAddressRange: '10.9.2${i}.0/24'
     parWorkspaceResourceId: workspace.outputs.resourceId    
     adminUsername: adminUsername
     adminPassword: adminPassword

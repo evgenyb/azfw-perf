@@ -52,45 +52,45 @@ module modVNet 'br/public:avm/res/network/virtual-network:0.7.0' = {
   }
 }
 
-// module publicIP 'br/public:avm/res/network/public-ip-address:0.9.0' = {
-//   name: 'deploy-public-ip'
-//   params: {
-//     name: 'pip-bastion-${parLocation}'
-//     location: parLocation
-//     skuName: 'Standard'
-//     availabilityZones: []
-//   }
-// }
+module publicIP 'br/public:avm/res/network/public-ip-address:0.9.0' = {
+  name: 'deploy-public-ip'
+  params: {
+    name: 'pip-bastion-${parLocation}'
+    location: parLocation
+    skuName: 'Standard'
+    availabilityZones: []
+  }
+}
 
-// resource resBastion 'Microsoft.Network/bastionHosts@2024-07-01' = {
-//   name: 'bastion-${parLocation}'
-//   location: parLocation
-//   sku: {
-//     name: 'Standard'
-//   }
-//   properties: {
-//     enableTunneling: true
-//     enableIpConnect: false
-//     disableCopyPaste: false
-//     enableShareableLink: false
-//     enableKerberos: false
-//     enableSessionRecording: false
-//     ipConfigurations: [
-//       {
-//         name: 'IpConfAzureBastionSubnet'
-//         properties: {
-//           privateIPAllocationMethod: 'Dynamic'
-//           publicIPAddress: {
-//             id: publicIP.outputs.resourceId
-//           }
-//           subnet: {
-//             id: '${modVNet.outputs.resourceId}/subnets/AzureBastionSubnet'
-//           }
-//         }
-//       }
-//     ]
-//   }
-// }
+resource resBastion 'Microsoft.Network/bastionHosts@2024-07-01' = {
+  name: 'bastion-${parLocation}'
+  location: parLocation
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    enableTunneling: true
+    enableIpConnect: false
+    disableCopyPaste: false
+    enableShareableLink: false
+    enableKerberos: false
+    enableSessionRecording: false
+    ipConfigurations: [
+      {
+        name: 'IpConfAzureBastionSubnet'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: publicIP.outputs.resourceId
+          }
+          subnet: {
+            id: '${modVNet.outputs.resourceId}/subnets/AzureBastionSubnet'
+          }
+        }
+      }
+    ]
+  }
+}
 
 module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
   name: 'deploy-hub-vm-${parLocation}'
@@ -122,16 +122,7 @@ module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
       managedDisk: {
         storageAccountType: 'Standard_LRS'
       }
-    }
-    extensionCustomScriptConfig: {
-      name: 'install-iperf3'
-      settings: {
-        fileUris: [
-          'https://raw.githubusercontent.com/evgenyb/azfw-perf/refs/heads/main/iac/scripts/init.sh'
-        ]
-        commandToExecute: 'sh init.sh'
-      }
-    }
+    }    
     osType: 'Linux'
     vmSize: vmSize
     availabilityZone: -1
@@ -140,44 +131,44 @@ module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
   }
 }
 
-// module firewallPolicy 'br/public:avm/res/network/firewall-policy:0.3.1' = {
-//   name: 'firewallPolicyDeployment'
-//   params: {
-//     name: 'nfp-${parLocation}'
-//     tier: 'Basic'
-//     threatIntelMode: 'Off'
-//   }
-// }
+module firewallPolicy 'br/public:avm/res/network/firewall-policy:0.3.1' = {
+  name: 'firewallPolicyDeployment'
+  params: {
+    name: 'nfp-${parLocation}'
+    tier: 'Standard'
+    threatIntelMode: 'Off'
+  }
+}
 
-// var nafName = 'naf-${parLocation}'
-// module azureFirewall 'br/public:avm/res/network/azure-firewall:0.8.0' = {
-//   name: 'deploy-azure-firewall-basic'
-//   params: {
-//     name: nafName
-//     azureSkuTier: 'Basic'
-//     location: parLocation
-//     virtualNetworkResourceId: modVNet.outputs.resourceId
-//     firewallPolicyId: firewallPolicy.outputs.resourceId
-//     publicIPAddressObject: {
-//       name: 'pip-${nafName}'
-//       publicIPAllocationMethod: 'Static'
-//       skuName: 'Standard'
-//       skuTier: 'Regional'
-//     }    
-//     diagnosticSettings: [
-//       {
-//         name: 'diagnostics'
-//         workspaceResourceId: parWorkspaceResourceId
-//         logAnalyticsDestinationType: 'Dedicated'
-//         logCategoriesAndGroups: [
-//           {
-//             categoryGroup: 'allLogs'
-//             enabled: true
-//           }
-//         ]
-//       }
-//     ]
-//   }
-// }
+var nafName = 'naf-${parLocation}'
+module azureFirewall 'br/public:avm/res/network/azure-firewall:0.8.0' = {
+  name: 'deploy-azure-firewall-basic'
+  params: {
+    name: nafName
+    azureSkuTier: 'Standard'
+    location: parLocation
+    virtualNetworkResourceId: modVNet.outputs.resourceId
+    firewallPolicyId: firewallPolicy.outputs.resourceId
+    publicIPAddressObject: {
+      name: 'pip-${nafName}'
+      publicIPAllocationMethod: 'Static'
+      skuName: 'Standard'
+      skuTier: 'Regional'
+    }    
+    diagnosticSettings: [
+      {
+        name: 'diagnostics'
+        workspaceResourceId: parWorkspaceResourceId
+        logAnalyticsDestinationType: 'Dedicated'
+        logCategoriesAndGroups: [
+          {
+            categoryGroup: 'allLogs'
+            enabled: true
+          }
+        ]
+      }
+    ]
+  }
+}
 
 output hubVnetId string = modVNet.outputs.resourceId
