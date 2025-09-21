@@ -40,6 +40,26 @@ module hub 'modules/hub.bicep' = {
   }
 }
 
+module firewallRouteTable 'br/public:avm/res/network/route-table:0.5.0' = {
+  name: 'deploy-route-firewall'
+  scope: resourceGroup(resourceGroupName)
+  params: {
+    // Required parameters
+    name: 'to-firewall'
+    // Non-required parameters
+    routes: [
+      {
+        name: 'default'
+        properties: {
+          addressPrefix: '0.0.0.0/0'
+          nextHopType: 'VirtualAppliance'
+          nextHopIpAddress: hub.outputs.firewallPrivateIP
+        }
+      }
+    ]
+  }
+}
+
 module servers 'modules/server.bicep' = [for i in range(1, 4): {
   name: 'deploy-servers${i}-${resourcePrefix}'
   scope: resourceGroup(resourceGroupName)
@@ -52,6 +72,7 @@ module servers 'modules/server.bicep' = [for i in range(1, 4): {
     adminPassword: adminPassword
     hubVnetId: hub.outputs.hubVnetId
     vmSize: 'Standard_D2ds_v6'
+    firewallRouteResourceId: firewallRouteTable.outputs.resourceId
   }  
 }]
 
@@ -69,7 +90,9 @@ module clients 'modules/client.bicep' = [for i in range(1, 4): {
     adminUsername: adminUsername
     adminPassword: adminPassword
     hubVnetId: hub.outputs.hubVnetId
+    serverVNetId: servers[i - 1].outputs.serverVNetId
     vmSize: 'Standard_D2ds_v6'
+    firewallRouteResourceId: firewallRouteTable.outputs.resourceId
   }  
 }]
 

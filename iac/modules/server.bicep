@@ -9,6 +9,7 @@ param adminUsername string
 param adminPassword string
 param hubVnetId string
 param vmSize string
+param firewallRouteResourceId string
 
 var varVNetName = 'vnet-server${parIndex}-${parLocation}'
 
@@ -35,6 +36,7 @@ module modVNet 'br/public:avm/res/network/virtual-network:0.7.0' = {
       {
         addressPrefixes: [parAddressRange]
         name: 'subnet-workload'
+        routeTableResourceId: firewallRouteResourceId
       }
     ]
     peerings: [

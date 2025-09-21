@@ -140,6 +140,66 @@ module firewallPolicy 'br/public:avm/res/network/firewall-policy:0.3.1' = {
   }
 }
 
+resource firewallPolicies 'Microsoft.Network/firewallPolicies@2024-07-01' existing = {
+  name: 'nfp-${parLocation}'
+  dependsOn: [
+    firewallPolicy
+  ]
+}
+
+resource spokesRuleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2023-05-01' = {
+  parent: firewallPolicies
+  name: 'SpokesFirewallRuleCollectionGroup'
+  properties: {
+    priority: 200
+    ruleCollections: [
+      {
+        name: 'spokes-net-rc01'
+        ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
+        priority: 100
+        action: {
+          type: 'Allow'
+        }
+        rules: [
+        {
+            name: 'allow-client-to-server'
+            ruleType: 'NetworkRule'
+            description: 'Allow communication between client and server VNets'
+            sourceAddresses: [
+              '10.9.11.0/24'
+              '10.9.12.0/24'
+              '10.9.13.0/24'
+              '10.9.14.0/24'
+              '10.9.21.0/24'
+              '10.9.22.0/24'
+              '10.9.23.0/24'
+              '10.9.24.0/24'
+            ]
+            ipProtocols: [
+              'ICMP'
+              'TCP'
+            ]
+            destinationPorts: [
+              '5201'
+              '443'
+            ]
+            destinationAddresses: [
+              '10.9.11.0/24'
+              '10.9.12.0/24'
+              '10.9.13.0/24'
+              '10.9.14.0/24'
+              '10.9.21.0/24'
+              '10.9.22.0/24'
+              '10.9.23.0/24'
+              '10.9.24.0/24'
+            ]
+          }          
+        ]
+      }                
+    ]
+  }
+}
+
 var nafName = 'naf-${parLocation}'
 module azureFirewall 'br/public:avm/res/network/azure-firewall:0.8.0' = {
   name: 'deploy-azure-firewall-basic'
@@ -172,3 +232,4 @@ module azureFirewall 'br/public:avm/res/network/azure-firewall:0.8.0' = {
 }
 
 output hubVnetId string = modVNet.outputs.resourceId
+output firewallPrivateIP string = azureFirewall.outputs.privateIp

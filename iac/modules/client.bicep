@@ -8,7 +8,9 @@ param adminUsername string
 @secure()
 param adminPassword string
 param hubVnetId string
+param serverVNetId string
 param vmSize string
+param firewallRouteResourceId string
 
 var varVNetName = 'vnet-client${parIndex}-${parLocation}'
 
@@ -35,6 +37,7 @@ module modVNet 'br/public:avm/res/network/virtual-network:0.7.0' = {
       {
         addressPrefixes: [parAddressRange]
         name: 'subnet-workload'
+        routeTableResourceId: firewallRouteResourceId
       }
     ]
     peerings: [
@@ -49,6 +52,17 @@ module modVNet 'br/public:avm/res/network/virtual-network:0.7.0' = {
         remoteVirtualNetworkResourceId: hubVnetId
         useRemoteGateways: false
       }
+      // {
+      //   allowForwardedTraffic: true
+      //   allowGatewayTransit: false
+      //   allowVirtualNetworkAccess: true
+      //   remotePeeringAllowForwardedTraffic: true
+      //   remotePeeringAllowVirtualNetworkAccess: true
+      //   remotePeeringEnabled: true
+      //   remotePeeringName: 'server-to-client${parIndex}'
+      //   remoteVirtualNetworkResourceId: serverVNetId
+      //   useRemoteGateways: false
+      // }
     ]    
     enableTelemetry: false
   }
