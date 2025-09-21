@@ -9,10 +9,8 @@ param adminUsername string
 param adminPassword string
 param hubVnetId string
 param vmSize string
-@description('Conditional. The entry point script to run. If the command contains any credentials, use the same property of the `protectedSettings` instead. Required if `protectedSettings.commandToExecute` is not provided.')
-param commandToExecute string
 
-var varVNetName = 'vnet-spoke${parIndex}-${parLocation}'
+var varVNetName = 'vnet-client${parIndex}-${parLocation}'
 
 module modVNet 'br/public:avm/res/network/virtual-network:0.7.0' = {
   name: 'deploy-${varVNetName}-${parIndex}'
@@ -47,7 +45,7 @@ module modVNet 'br/public:avm/res/network/virtual-network:0.7.0' = {
         remotePeeringAllowForwardedTraffic: true
         remotePeeringAllowVirtualNetworkAccess: true
         remotePeeringEnabled: true
-        remotePeeringName: 'hub-to-spoke${parIndex}'
+        remotePeeringName: 'hub-to-client${parIndex}'
         remoteVirtualNetworkResourceId: hubVnetId
         useRemoteGateways: false
       }
@@ -57,7 +55,7 @@ module modVNet 'br/public:avm/res/network/virtual-network:0.7.0' = {
 }
 
 module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
-  name: 'deploy-spoke${parIndex}-vm-${parLocation}'
+  name: 'deploy-client${parIndex}-vm-${parLocation}'
   params: {
     adminUsername: adminUsername
     adminPassword: adminPassword
@@ -67,7 +65,7 @@ module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
       sku: '22_04-lts-gen2'
       version: 'latest'
     }
-    name: 'vm-spoke${parIndex}-${parLocation}'
+    name: 'vm-client${parIndex}-${parLocation}'
     nicConfigurations: [
       {
         ipConfigurations: [
@@ -90,7 +88,10 @@ module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
     extensionCustomScriptConfig: {
       name: 'install-iperf3'
       settings: {
-        commandToExecute: commandToExecute
+        fileUris: [
+          'https://raw.githubusercontent.com/evgenyb/azfw-perf/refs/heads/main/iac/scripts/init.sh'
+        ]
+        commandToExecute: 'sh client.sh'
       }
     }
     osType: 'Linux'
@@ -101,4 +102,4 @@ module modVirtualMachine 'br/public:avm/res/compute/virtual-machine:0.20.0' = {
   }
 }
 
-output spokeVNetId string = modVNet.outputs.resourceId
+output clientVNetId string = modVNet.outputs.resourceId
