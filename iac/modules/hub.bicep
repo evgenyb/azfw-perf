@@ -7,6 +7,7 @@ param adminUsername string
 @secure()
 param adminPassword string
 param vmSize string
+param firewallSKU string
 
 var varVNetName = 'vnet-hub-${parLocation}'
 
@@ -135,7 +136,7 @@ module firewallPolicy 'br/public:avm/res/network/firewall-policy:0.3.1' = {
   name: 'firewallPolicyDeployment'
   params: {
     name: 'nfp-${parLocation}'
-    tier: 'Standard'
+    tier: firewallSKU
     threatIntelMode: 'Off'
   }
 }
@@ -195,17 +196,69 @@ resource spokesRuleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleColle
             ]
           }          
         ]
+      }                      
+    ]
+  }
+}
+
+resource spokesAppRuleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2023-05-01' = {
+  parent: firewallPolicies
+  name: 'SpokesAppRuleCollectionGroup'
+  dependsOn: [
+    spokesRuleCollectionGroup
+  ]
+  properties: {
+    priority: 200
+    ruleCollections: [
+      {
+        name: 'spokes-app-rc01'
+        ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
+        priority: 100
+        action: {
+          type: 'Allow'
+        }
+        rules: [
+        {
+            name: 'allow-to-internet'
+            ruleType: 'ApplicationRule'
+            description: 'Allow communication to Internet'
+            sourceAddresses: [
+              '10.9.11.0/24'
+              '10.9.12.0/24'
+              '10.9.13.0/24'
+              '10.9.14.0/24'
+              '10.9.21.0/24'
+              '10.9.22.0/24'
+              '10.9.23.0/24'
+              '10.9.24.0/24'
+            ]
+            protocols: [
+              {
+                protocolType: 'Http'
+                port: 80
+              }
+              {
+                protocolType: 'Https'
+                port: 443
+              }
+            ]            
+            targetFqdns: [
+              '*'
+            ]            
+          }          
+        ]
       }                
     ]
   }
 }
 
+
 var nafName = 'naf-${parLocation}'
 module azureFirewall 'br/public:avm/res/network/azure-firewall:0.8.0' = {
-  name: 'deploy-azure-firewall-basic'
+  name: 'deploy-azure-firewall'
   params: {
     name: nafName
-    azureSkuTier: 'Standard'
+    azureSkuTier: firewallSKU
     location: parLocation
     virtualNetworkResourceId: modVNet.outputs.resourceId
     firewallPolicyId: firewallPolicy.outputs.resourceId

@@ -37,6 +37,7 @@ module hub 'modules/hub.bicep' = {
     adminUsername: adminUsername
     adminPassword: adminPassword
     vmSize: 'Standard_B1s'
+    firewallSKU: 'Premium'
   }
 }
 
