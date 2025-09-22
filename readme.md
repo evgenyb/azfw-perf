@@ -47,20 +47,16 @@ iperf3 -c 10.9.14.4 -t 600 -P 32
 ### Test bandwidth without Azure Firewall (10 min with 32 threads)
 
 #### client1 -> server1
-[SUM]   0.00-600.00 sec   739 GBytes  10.6 Gbits/sec  1192             sender
-[SUM]   0.00-600.00 sec   739 GBytes  10.6 Gbits/sec                  receiver
+[SUM]   0.00-600.00 sec   739 GBytes  10.6 Gbits/sec               
 
 #### client2 -> server2
-[SUM]   0.00-600.00 sec   859 GBytes  12.3 Gbits/sec  649             sender
-[SUM]   0.00-600.01 sec   859 GBytes  12.3 Gbits/sec                  receiver
+[SUM]   0.00-600.00 sec   859 GBytes  12.3 Gbits/sec               
 
 #### client3 -> server3
-[SUM]   0.00-600.00 sec   859 GBytes  12.3 Gbits/sec  1257             sender
-[SUM]   0.00-600.01 sec   859 GBytes  12.3 Gbits/sec                  receiver
+[SUM]   0.00-600.00 sec   859 GBytes  12.3 Gbits/sec               
 
 #### client4 -> server4
-[SUM]   0.00-600.00 sec   852 GBytes  12.2 Gbits/sec  1441             sender
-[SUM]   0.00-600.01 sec   852 GBytes  12.2 Gbits/sec                  receiver
+[SUM]   0.00-600.00 sec   852 GBytes  12.2 Gbits/sec               
 
 ### Enable Firewall Standard SKU
 
@@ -68,9 +64,11 @@ Run #1
 #### client1 -> server1
 lost data
 #### client2 -> server2
-[SUM] 598.00-599.00 sec   198 MBytes  1.66 Gbits/sec  296
+[SUM] 598.00-599.00 sec   198 MBytes  1.66 Gbits/sec  
+
 #### client3 -> server3
 [SUM] 596.00-597.00 sec   188 MBytes  1.57 Gbits/sec
+
 #### client4 -> server4
 [SUM] 598.00-599.00 sec   318 MBytes  2.66 Gbits/sec
 
@@ -127,8 +125,43 @@ Run #5
 #### client4 -> server4
 [SUM]   0.00-600.01 sec   505 GBytes  7.23 Gbits/sec  
 
-### Test bandwidth with Firewall Standard
+### Test case 2
+Run 4 test sessions for 60 min and observe the Azure bandwidth metrics
+
 
 ### Upgrade Firewall to Premium SKU
 
-### Test bandwidth with Firewall Standard
+### Test bandwidth with Firewall Premium
+
+```bash
+iperf3 -c 10.9.11.4 -t 1800 -P 32
+iperf3 -c 10.9.12.4 -t 1800 -P 32
+iperf3 -c 10.9.13.4 -t 1800 -P 32
+iperf3 -c 10.9.14.4 -t 1800 -P 32
+```
+
+Run #1
+#### client1 -> server1
+[SUM]   0.00-890.22 sec   512 GBytes  4.94 Gbits/sec
+
+#### client2 -> server2
+[SUM]   0.00-890.52 sec   392 GBytes  3.78 Gbits/sec
+
+#### client3 -> server3
+[SUM]   0.00-890.06 sec   494 GBytes  4.77 Gbits/sec
+
+#### client4 -> server4
+[SUM]   0.00-889.84 sec   457 GBytes  4.41 Gbits/sec
+
+Run #2
+#### client1 -> server1
+[SUM]   0.00-460.84 sec   634 GBytes  11.8 Gbits/sec
+
+#### client2 -> server2
+[SUM]   0.00-459.47 sec   632 GBytes  11.8 Gbits/se
+
+#### client3 -> server3
+[SUM]   0.00-458.38 sec   631 GBytes  11.8 Gbits/sec
+
+#### client4 -> server4
+[SUM]   0.00-458.43 sec   631 GBytes  11.8 Gbits/sec
